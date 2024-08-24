@@ -7,6 +7,7 @@ import type { TOptionSettings } from '~/common';
 const staticAtoms = {
   abortScroll: atom<boolean>({ key: 'abortScroll', default: false }),
   showFiles: atom<boolean>({ key: 'showFiles', default: false }),
+  editingFile: atom<string>({ key: 'editingFile', default: '' }),
   optionSettings: atom<TOptionSettings>({ key: 'optionSettings', default: {} }),
   showPluginStoreDialog: atom<boolean>({ key: 'showPluginStoreDialog', default: false }),
   showAgentSettings: atom<boolean>({ key: 'showAgentSettings', default: false }),
@@ -44,6 +45,7 @@ const localStorageAtoms = {
   rememberForkOption: atomWithLocalStorage('rememberForkOption', true),
   playbackRate: atomWithLocalStorage<number | null>('playbackRate', null),
   saveDrafts: atomWithLocalStorage('saveDrafts', false),
+  markdownUser: atomWithLocalStorage('markdownUser', false),
 };
 
 export default { ...staticAtoms, ...localStorageAtoms };

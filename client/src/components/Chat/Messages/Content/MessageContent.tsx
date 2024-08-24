@@ -9,6 +9,8 @@ import { useLocalize } from '~/hooks';
 import Container from './Container';
 import Markdown from './Markdown';
 import { cn } from '~/utils';
+import { useRecoilValue } from 'recoil';
+import store from '~/store';
 
 export const ErrorMessage = ({
   text,
@@ -63,6 +65,7 @@ export const ErrorMessage = ({
 
 // Display Message Component
 const DisplayMessage = ({ text, isCreatedByUser, message, showCursor }: TDisplayProps) => {
+  const markdownUser = useRecoilValue<boolean>(store.markdownUser);
   return (
     <Container message={message}>
       <div
@@ -72,7 +75,7 @@ const DisplayMessage = ({ text, isCreatedByUser, message, showCursor }: TDisplay
           isCreatedByUser ? 'whitespace-pre-wrap dark:text-gray-20' : 'dark:text-gray-100',
         )}
       >
-        {!isCreatedByUser ? (
+        {!isCreatedByUser || markdownUser ? (
           <Markdown content={text} message={message} showCursor={showCursor} />
         ) : (
           <>{text}</>

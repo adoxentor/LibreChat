@@ -1,4 +1,4 @@
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import TextareaAutosize from 'react-textarea-autosize';
 import { EModelEndpoint } from 'librechat-data-provider';
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -9,6 +9,8 @@ import { cn, removeFocusRings } from '~/utils';
 import { useLocalize } from '~/hooks';
 import Container from './Container';
 import store from '~/store';
+import TiptapMarkdownEditor from '~/components/Chat/Messages/Content/TiptapMarkdownEditor';
+import { Switch } from '~/components';
 
 const EditMessage = ({
   text,
@@ -33,6 +35,8 @@ const EditMessage = ({
   const endpoint = endpointType ?? _endpoint;
   const updateMessageMutation = useUpdateMessageMutation(conversationId ?? '');
   const localize = useLocalize();
+  const markdownUser = useRecoilValue<boolean>(store.markdownUser); // Add this line
+  const [useMarkdownEditor, setUseMarkdownEditor] = useState<boolean>(markdownUser); // Add this line
 
   useEffect(() => {
     const textArea = textAreaRef.current;
@@ -128,44 +132,55 @@ const EditMessage = ({
 
   return (
     <Container message={message}>
-      <div className="bg-token-main-surface-primary relative flex w-full flex-grow flex-col overflow-hidden rounded-2xl border dark:border-gray-600 dark:text-white [&:has(textarea:focus)]:border-gray-300 [&:has(textarea:focus)]:shadow-[0_2px_6px_rgba(0,0,0,.05)] dark:[&:has(textarea:focus)]:border-gray-500">
-        <TextareaAutosize
-          ref={textAreaRef}
-          onChange={(e) => {
-            setEditedText(e.target.value);
-          }}
-          onKeyDown={handleKeyDown}
-          data-testid="message-text-editor"
-          className={cn(
-            'markdown prose dark:prose-invert light whitespace-pre-wrap break-words',
-            'pl-3 md:pl-4',
-            'm-0 w-full resize-none border-0 bg-transparent py-[10px]',
-            'placeholder-black/50 focus:ring-0 focus-visible:ring-0 dark:bg-transparent dark:placeholder-white/50 md:py-3.5  ',
-            'pr-3 md:pr-4',
-            'max-h-[65vh] md:max-h-[75vh]',
-            removeFocusRings,
-          )}
-          onPaste={(e) => {
-            e.preventDefault();
+      <div className="bg-token-main-surface-primary relative flex w-full flex-grow flex-col overflow-hidden rounded-2xl border dark:border-gray-600 dark:text-white dark:focus-within:border-gray-500 [&:has(textarea:focus)]:border-gray-300 [&:has(textarea:focus)]:shadow-[0_2px_6px_rgba(0,0,0,.05)]">
+        {useMarkdownEditor ? (
+          <TiptapMarkdownEditor content={editedText} setContent={setEditedText} />
+        ) : (
+          <TextareaAutosize
+            ref={textAreaRef}
+            onChange={(e) => {
+              setEditedText(e.target.value);
+            }}
+            onKeyDown={handleKeyDown}
+            data-testid="message-text-editor"
+            className={cn(
+              'markdown prose dark:prose-invert light whitespace-pre-wrap break-words',
+              'pl-3 md:pl-4',
+              'm-0 w-full resize-none border-0 bg-transparent py-[10px]',
+              'placeholder-black/50 focus:ring-0 focus-visible:ring-0 dark:bg-transparent dark:placeholder-white/50 md:py-3.5  ',
+              'pr-3 md:pr-4',
+              'max-h-[65vh] md:max-h-[75vh]',
+              removeFocusRings,
+            )}
+            onPaste={(e) => {
+              e.preventDefault();
 
-            const pastedData = e.clipboardData.getData('text/plain');
-            const textArea = textAreaRef.current;
-            if (!textArea) {
-              return;
-            }
-            const start = textArea.selectionStart;
-            const end = textArea.selectionEnd;
-            const newValue =
-              textArea.value.substring(0, start) + pastedData + textArea.value.substring(end);
-            setEditedText(newValue);
-          }}
-          contentEditable={true}
-          value={editedText}
-          suppressContentEditableWarning={true}
-          dir="auto"
-        />
+              const pastedData = e.clipboardData.getData('text/plain');
+              const textArea = textAreaRef.current;
+              if (!textArea) {
+                return;
+              }
+              const start = textArea.selectionStart;
+              const end = textArea.selectionEnd;
+              const newValue =
+                textArea.value.substring(0, start) + pastedData + textArea.value.substring(end);
+              setEditedText(newValue);
+            }}
+            contentEditable={true}
+            value={editedText}
+            suppressContentEditableWarning={true}
+            dir="auto"
+          />
+        )}
       </div>
       <div className="mt-2 flex w-full justify-center text-center">
+        <Switch
+          id="useMarkdownEditor"
+          checked={useMarkdownEditor}
+          onCheckedChange={setUseMarkdownEditor}
+          className="ml-4 mt-2"
+          data-testid="showCode"
+        />
         <button
           className="btn btn-primary relative mr-2"
           disabled={

@@ -17,6 +17,7 @@ import HoverToggle from './HoverToggle';
 import { cn } from '~/utils';
 import store from '~/store';
 import ShareButton from './ShareButton';
+import MovingText from '~/components/ui/MovingText';
 
 type KeyEvent = KeyboardEvent<HTMLInputElement>;
 
@@ -180,7 +181,12 @@ export default function Conversation({ conversation, retainView, toggleNav, isLa
           context="menu-item"
         />
         {!renaming && (
-          <div className="relative line-clamp-1 max-h-5 flex-1 grow overflow-hidden">{title}</div>
+          <MovingText
+            className="relative line-clamp-1 max-h-5 flex-1 grow overflow-hidden"
+            extraSpace={80}
+          >
+            {title}
+          </MovingText>
         )}
         {isActiveConvo ? (
           <div

@@ -2183,3 +2183,29 @@ ol ol):not(:where([class~=not-prose] *)) {
   animation: moveUp 4s ease-in-out infinite;
   
 }
+
+
+.moving-text-container {
+    --translate-duration: 0s;
+    --translate: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.moving-text-box {
+    display: inline-block;
+    white-space: nowrap;
+    --delay-prop: 500ms;
+    transition: all var(--translate-duration, 0s) linear var(--delay-prop);
+    /*transform: translateX(var(--translate, 0));*/
+    transform: translateX(0);
+}
+
+.moving-text-container:hover .moving-text-box {
+    transform: translateX(var(--translate));
+}
+
+.moving-text-container .moving-text-box.back {
+    --delay-prop:0ms;
+    transition: transform calc(var(--translate-duration, 0s)*2) linear 0ms;
+}

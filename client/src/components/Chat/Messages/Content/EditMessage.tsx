@@ -9,6 +9,7 @@ import { cn, removeFocusRings } from '~/utils';
 import { useLocalize } from '~/hooks';
 import Container from './Container';
 import store from '~/store';
+import { handlePasteAsPlainText } from '~/utils/pasteHandler';
 
 const EditMessage = ({
   text,
@@ -96,7 +97,7 @@ const EditMessage = ({
       setLatestMultiMessage({ ...latestMultiMessage, text: editedText });
     }
 
-    const isInMessages = messages?.some((message) => message?.messageId === messageId);
+    const isInMessages = messages.some((message) => message.messageId === messageId);
     if (!isInMessages) {
       message.text = editedText;
     } else {
@@ -145,20 +146,7 @@ const EditMessage = ({
             'max-h-[65vh] md:max-h-[75vh]',
             removeFocusRings,
           )}
-          onPaste={(e) => {
-            e.preventDefault();
-
-            const pastedData = e.clipboardData.getData('text/plain');
-            const textArea = textAreaRef.current;
-            if (!textArea) {
-              return;
-            }
-            const start = textArea.selectionStart;
-            const end = textArea.selectionEnd;
-            const newValue =
-              textArea.value.substring(0, start) + pastedData + textArea.value.substring(end);
-            setEditedText(newValue);
-          }}
+          onPaste={(event) => handlePasteAsPlainText(event, textAreaRef, setEditedText)}
           contentEditable={true}
           value={editedText}
           suppressContentEditableWarning={true}
